@@ -1,5 +1,5 @@
 # EcoGPT API 
-API DOCUMENTAION LINK - [https://qrkode.link/vjFJfQ](OPEN)
+API DOCUMENTAION LINK - [OPEN](https://qrkode.link/vjFJfQ)
 
 ## Overview
 
