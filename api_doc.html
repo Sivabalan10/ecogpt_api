@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        pre {
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .endpoint {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-left: 5px solid #007bff;
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;color: #007bff;">EcoGPT API - Save Energy for Future</h1>
+  
+        <h1>API Documentation</h1>
+        <p>This document outlines the usage of the API endpoints for the project.</p>
+        
+        <h2>1. User Login</h2>
+        <div class="endpoint">
+            <p><strong>Endpoint:</strong> <code>/user_login</code></p>
+            <p><strong>Method:</strong> POST</p>
+            <p><strong>Request Body:</strong></p>
+            <pre>{
+    "username": "user123",
+    "password": "mypassword"
+}</pre>
+            <p><strong>Response:</strong></p>
+            <pre>{
+    "status": "success",
+    "message": "Login successful",
+    "user_data": { ... }
+}</pre>
+        </div>
+        
+        <h2>2. User Logout</h2>
+        <div class="endpoint">
+            <p><strong>Endpoint:</strong> <code>/user_log_out</code></p>
+            <p><strong>Method:</strong> POST</p>
+            <p><strong>Response:</strong></p>
+            <pre>{ "status": "success", "message": "User logged out successfully" }</pre>
+        </div>
+        
+        <h2>3. Get User Data</h2>
+        <div class="endpoint">
+            <p><strong>Endpoint:</strong> <code>/get_all_user_table_data/&lt;user_id&gt;</code></p>
+            <p><strong>Method:</strong> GET</p>
+            <p><strong>Response:</strong></p>
+            <pre>{ "status": "success", "user_data": { ... } }</pre>
+        </div>
+        
+        <h2>4. Check-in</h2>
+        <div class="endpoint">
+            <p><strong>Endpoint:</strong> <code>/check_in</code></p>
+            <p><strong>Method:</strong> POST</p>
+            <p><strong>Request Body:</strong></p>
+            <pre>{
+    "user_id": 1,
+    "lat": 12.345,
+    "lon": 67.890
+}</pre>
+            <p><strong>Response:</strong></p>
+            <pre>{ "status": "success", "message": "Check-in successful" }</pre>
+        </div>
+        
+        <h2>5. Check-out</h2>
+        <div class="endpoint">
+            <p><strong>Endpoint:</strong> <code>/check_out</code></p>
+            <p><strong>Method:</strong> POST</p>
+            <p><strong>Request Body:</strong></p>
+            <pre>{
+    "user_id": 1,
+    "lat": 12.345,
+    "lon": 67.890
+}</pre>
+            <p><strong>Response:</strong></p>
+            <pre>{ "status": "success", "message": "Check-out successful" }</pre>
+        </div>
+        
+        <h2>6. View Reports</h2>
+        <div class="endpoint">
+            <p><strong>Endpoint:</strong> <code>/view_reports/&lt;user_id&gt;</code></p>
+            <p><strong>Method:</strong> GET</p>
+            <p><strong>Response:</strong></p>
+            <pre>{ "status": "success", "records": [...] }</pre>
+        </div>
+        
+        <h2>7. Make Transaction</h2>
+        <div class="endpoint">
+            <p><strong>Endpoint:</strong> <code>/make_transaction</code></p>
+            <p><strong>Method:</strong> POST</p>
+            <p><strong>Request Body:</strong></p>
+            <pre>{
+    "user_id": 1,
+    "product_name": "Product A",
+    "cc_points": 50
+}</pre>
+            <p><strong>Response:</strong></p>
+            <pre>{ "status": "success", "message": "Transaction successful" }</pre>
+        </div>
+        
+        <h2>8. Power Unit Saved</h2>
+        <div class="endpoint">
+            <p><strong>Endpoint:</strong> <code>/power_unit_saved</code></p>
+            <p><strong>Method:</strong> GET</p>
+            <p><strong>Response:</strong></p>
+            <pre>{ "status": "success", "total_power_saved": 100 }</pre>
+        </div>
+
+</body>
+</html>
