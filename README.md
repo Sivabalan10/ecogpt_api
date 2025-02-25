@@ -85,7 +85,7 @@ curl -X GET http://localhost:5000/energy-data
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSEe) file for details.
 
 ## Disclaimer
 
