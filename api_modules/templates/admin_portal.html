@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #121343, #2b2167);
+            margin: 0;
+            padding: 0;
+            font-family: "Montserrat", serif;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 50px;
+            height: 80%;
+            width: 250px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding-top: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            transition: background 0.3s;
+            text-align: center;
+        }
+
+        .sidebar ul li:hover {
+            background: rgb(243, 243, 243);
+            color: #121343;
+
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            display: block;
+        }
+
+        .sidebar ul li a:hover {
+            color: #ffcc00;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            padding: 10px;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        /* Content Area */
+        .content {
+            margin-left: 260px;
+            padding: 20px;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .chart-summary {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 64, 128, 0.8);
+            color: white;
+            margin-top: 20px;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="logo">Admin Panel</div>
+        <ul>
+            <li><a href="/admin_portal">Home</a></li>
+            <li><a href="/user_management">User Management</a></li>
+            <li><a href="/records">Records</a></li>
+            <li><a href="/power_units">Power Units</a></li>
+            <li><a href="/map">View Map</a></li>
+            <li><a href="http://192.168.16.28:5002/dashboard">Live Monitoring</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div id="flash-messages">
+            {% with messages = get_flashed_messages() %}
+                {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endwith %}
+        </div>
+        <h2 style="text-align: center;color: #fff;text-decoration: dotted;">ERP BY ECOGPT SYSTEM</h2>
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-4"><div class="dashboard-card"><h5>Total Users</h5><p id="total-users">Loading...</p></div></div>
+                <div class="col-md-4"><div class="dashboard-card"><h5>Total Records</h5><p id="total-records">Loading...</p></div></div>
+                <div class="col-md-4"><div class="dashboard-card"><h5>Power Units Saved</h5><p id="total-power">Loading...</p></div></div>
+            </div>
+            <hr style="color: #fff;">
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <canvas id="lineChart"></canvas>
+                    <p class="chart-summary">Trend of Power Usage over the Week</p>
+                    <p style="text-align: center;color: #fff;">[ This graph represents the proportion of power consumption across different usage categories, helping to identify which areas consume the most energy. ]</p>
+                </div>
+                <div class="col-md-6">
+                    <canvas id="barChart"></canvas>
+                    <p class="chart-summary">Power Consumption per Day</p>
+                    <p style="text-align: center;color: #fff;">[ This chart evaluates the efficiency of power usage by comparing different metrics, such as energy savings versus wastage, to highlight areas for improvement. ]</p>
+                </div>
+            </div>
+            <hr style="color: #fff;">
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <canvas id="pieChart"></canvas>
+                    <p class="chart-summary">Usage Distribution</p>
+                    <p style="text-align: center;color: #fff;">[ This graph shows how power consumption fluctuates over the week, helping to identify peak usage days and trends in energy consumption. ]</p>
+                </div>
+                <div class="col-md-6">
+                    <canvas id="histogramChart"></canvas>
+                    <p class="chart-summary">Efficiency Analysis</p>
+                    <p style="text-align: center;color: #fff;">[ This chart provides a daily breakdown of power usage, making it easy to compare energy consumption across different days and spot high-usage periods. ]</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">&copy; 2025 College ERP - Admin Portal</div>
+
+    <script>
+
+        async function fetchData() {
+            let users = await fetch('/view_user_management').then(res => res.json());
+            let records = await fetch('/show_records').then(res => res.json());
+            let powerUnits = await fetch('/show_power_unit_table').then(res => res.json());
+            document.getElementById("total-users").textContent = users.users.length;
+            document.getElementById("total-records").textContent = records.records.length;
+            document.getElementById("total-power").textContent = powerUnits.power_units.length;
+
+            let chartColors = [
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 206, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)',
+                'rgba(255, 159, 64, 0.8)',
+                'rgba(0, 255, 127, 0.8)'
+            ];
+
+            let borderColors = chartColors.map(color => color.replace('0.8', '1'));
+
+            let chartData = {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Power Usage (kW)',
+                    data: [50, 10, 40, 10, 90, 100, 20],
+                    backgroundColor: chartColors,
+                    borderColor: borderColors,
+                    borderWidth: 2
+                }]
+            };
+
+            new Chart(document.getElementById("lineChart"), { 
+                type: 'line', 
+                data: chartData, 
+                options: { responsive: true } 
+            });
+
+            new Chart(document.getElementById("barChart"), { 
+                type: 'bar', 
+                data: chartData, 
+                options: { responsive: true } 
+            });
+
+            new Chart(document.getElementById("pieChart"), { 
+                type: 'pie', 
+                data: chartData, 
+                options: { responsive: true} 
+            });
+
+            new Chart(document.getElementById("histogramChart"), { 
+                type: 'doughnut', 
+                data: chartData, 
+                options: { responsive: true } 
+            });
+        }
+        fetchData();
+    </script>
+
+</body>
+</html>

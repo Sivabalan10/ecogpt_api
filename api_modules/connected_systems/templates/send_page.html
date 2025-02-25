@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sending Data...</title>
+    <style>
+        body {
+            background-color: black;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>📡 Sending Data Every 2 Seconds...</h1>
+    <p>This page runs in the background, sending system data.</p>
+    <script>
+        async function sendClientData() {
+            let response = await fetch('https://api64.ipify.org?format=json');
+            let data1 = await response.json(); // Await response.json() to properly parse it
+            let deviceId = data1.ip;  // Unique identifier (fallback)
+            let currentTime = new Date().toISOString();
+
+            let data = {
+                "device_id": deviceId,
+                "total_power_consumed": Math.round((Math.random() * 100) * 100) / 100,
+                "total_screen_on_duration": Math.floor(performance.now() / 1000) + "s",
+                "timestamp": currentTime
+            };
+
+            fetch("/receive", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => console.log("Sent:", data))
+            .catch(error => console.error("Error sending data:", error));
+        }
+
+        setInterval(sendClientData, 2000);  // Send every 2 seconds
+    </script>
+</body>
+</html>

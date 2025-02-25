@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #121343, #2b2167);
+            margin: 0;
+            padding: 0;
+            font-family: "Montserrat", serif;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 50px;
+            height: 80%;
+            width: 250px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding-top: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            transition: background 0.3s;
+            text-align: center;
+        }
+
+        .sidebar ul li:hover {
+            background: rgb(243, 243, 243);
+            color: #121343;
+
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            display: block;
+        }
+
+        .sidebar ul li a:hover {
+            color: #ffcc00;
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            padding: 10px;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        /* Content Area */
+        .content {
+            margin-left: 260px;
+            padding: 20px;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .chart-summary {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 64, 128, 0.8);
+            color: white;
+            margin-top: 20px;
+        }
+        .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+.custom-table thead {
+    background: linear-gradient(to right, #007bff, #6610f2);
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* Table Cells */
+.custom-table th, .custom-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Table Rows */
+.custom-table tbody tr {
+    transition: 0.3s;
+}
+
+/* Hover Effect */
+.custom-table tbody tr:hover {
+    background: #f4f4f4;
+    cursor: pointer;
+}
+
+/* Responsive Table */
+.table-responsive {
+    overflow-x: auto;
+    margin-top: 15px;
+    border-radius: 10px;
+}
+.alert-container {
+    background: #222;
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    width: 80%;
+    display: block;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(255, 0, 0, 0.5);
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.alert-container h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #ffcc00;
+}
+
+.alert-details p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.alert-status {
+    color: red;
+    font-weight: bold;
+}
+
+.mode-generator {
+    color: orange;
+    font-weight: bold;
+}
+
+.mode-main {
+    color: green;
+    font-weight: bold;
+}
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="logo">Admin Panel</div>
+        <ul>
+            <li><a href="/admin_portal">Home</a></li>
+            <li><a href="/user_management">User Management</a></li>
+            <li><a href="/records">Records</a></li>
+            <li><a href="/power_units">Power Units</a></li>
+            <li><a href="/map">View Map</a></li>
+            <li><a href="http://192.168.16.28:5002/dashboard">Live Monitoring</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <h2 style="text-align: center;color: #fff;text-decoration: dotted;">ERP BY ECOGPT SYSTEM</h2>
+        <div class="container">
+            <h2 class="text-center mt-3" style="color: #f4f4f4;">Power Units</h2>
+            <div class = "table-responsive">
+            <table class="custom-table">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Unit Name</th>
+                        <th>Power Consumption</th>
+                        <th>Status</th>
+                        <th>No of false count</th>
+                        <th>Current in count</th>
+                        <th>Current out count</th>
+                    </tr>
+                </thead>
+                <tbody id="power-units-table"></tbody>
+            </table>
+        </div></div>
+        
+        <br><br>
+        <div class="alert-container">
+            <h3>⚡ Alert Power Station</h3>
+            <div class="alert-details">
+                <p><strong>Emergency Alert:</strong> <span id="emergency-status" class="alert-status">Active</span></p>
+                <p><strong>Current Unit:</strong> <span id="current-unit">320 kW</span></p>
+                <p><strong>Supply Mode:</strong> <span id="supply-mode" class="mode-generator">Generator</span></p>
+                <br>
+                <hr>
+                <p>Call 044 4123 9821</p>
+            </div>
+        </div>
+
+    </div>
+    <br><br><br><br><br><br>
+    <div class="footer">&copy; 2025 College ERP - Admin Portal</div>
+
+    <script>
+        async function loadPowerUnits() {
+            let response = await fetch('/show_power_unit_table');
+    let data = await response.json();
+
+    let tableBody = document.getElementById("power-units-table");
+    tableBody.innerHTML = "";
+
+    data.power_units.forEach(unit => {
+        let row = `<tr>
+            <td>${unit.id}</td>
+            <td>${unit.unit_saved} kW</td>
+            <td>${unit.no_of_logged}</td>
+            <td>${unit.status}</td>
+            <td>${unit.no_of_false_count}</td>
+            <td>${unit.current_in_count}</td>
+            <td>${unit.current_out_count}</td>
+        </tr>`;
+        tableBody.innerHTML += row;
+    });
+        }
+        loadPowerUnits();
+        
+    </script>
+
+</body>
+</html>
+    

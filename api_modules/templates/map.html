@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REC IoT Device Map</title>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+      
+        body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0a2a43, #093161);
+    overflow: hidden;
+    position: relative;
+    color: white;
+}
+
+/* Adding animated neural network effect */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://www.transparenttextures.com/patterns/cubes.png');
+    opacity: 0.1;
+    animation: moveBackground 5s infinite linear;
+}
+
+@keyframes moveBackground {
+    0% { transform: translateX(0px) translateY(0px); }
+    50% { transform: translateX(10px) translateY(10px); }
+    100% { transform: translateX(0px) translateY(0px); }
+}
+
+/* Centered and styled heading */
+h2 {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Enhanced map styling */
+#map {
+    height: 500px;
+    width: 80%;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+}
+
+/* Smooth marker transition */
+.leaflet-interactive {
+    transition: transform 0.3s ease-in-out;
+}
+.flash-message {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 14px;
+        animation: fadeOut 3s forwards;
+    }
+
+    @keyframes fadeOut {
+        0% { opacity: 1; }
+        80% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+    </style>
+</head>
+<body>
+    <h2>Rajalakshmi Engineering College - IoT Devices</h2>
+    <div id="map"></div>
+    <div id="flash-container"></div>
+  
+    
+    
+    <script>
+        var map = L.map("map").setView([13.0339, 80.0432], 17);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 18,
+}).addTo(map);
+
+var deviceMarkers = {}; // Store markers by device ID
+
+// Load devices onto the map
+function loadDevices() {
+    fetch("http://192.168.16.28:3535/get_devices")
+        .then(response => response.json())
+        .then(devices => {
+            devices.forEach(device => {
+                var color = device.status === "active" ? "blue" : "red";
+
+                if (!deviceMarkers[device.id]) {
+                    // Create new marker if not exists
+                    deviceMarkers[device.id] = L.circleMarker([device.lat, device.lon], {
+                        color: color,
+                        radius: 8
+                    })
+                    .addTo(map)
+                    .bindPopup(`<b>${device.id}</b><br>Status: ${device.status}<br>Saved Units: 300w`);
+                } else {
+                    // Update existing marker
+                    deviceMarkers[device.id].setStyle({ color: color });
+                    deviceMarkers[device.id].setPopupContent(
+                        `<b>${device.id}</b><br>Status: ${device.status}<br>Saved Units: 300w`
+                    );
+                }
+            });
+        })
+        .catch(error => console.error("Error loading devices:", error));
+}
+
+// Run initially and set interval
+loadDevices();
+setInterval(loadDevices, 2000);
+
+// 🔥 FLASH MESSAGE HANDLING 🔥
+var lastMessage = ""; // Store last message to avoid duplicates
+
+function showFlashMessage(message) {
+    if (!message || message === lastMessage) return; // Ignore duplicate messages
+    lastMessage = message;
+
+    var flashDiv = document.createElement("div");
+    flashDiv.className = "flash-message";
+    flashDiv.innerHTML = message;
+    document.getElementById("flash-container").appendChild(flashDiv);
+
+    setTimeout(() => {
+        flashDiv.remove();
+    }, 3000);
+}
+
+function checkFlashMessages() {
+    fetch("/get_flash_messages")
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                showFlashMessage(data.message);
+            }
+        })
+        .catch(error => console.error("Error fetching flash messages:", error));
+}
+
+setInterval(checkFlashMessages, 2000);
+
+
+
+    </script>
+</body>
+</html>

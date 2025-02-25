@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connected Systems Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: black;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+        h1 {
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        table {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+            background-color: #111;
+        }
+        th, td {
+            border: 1px solid #00ff00;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #003300;
+        }
+        #chart-container {
+            width: 38%;
+            margin: 20px auto;
+            background: #111;
+            padding: 5px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Connected Systems Dashboard</h1>
+    <p>🖥️ Active Systems: <span id="connected-count">0</span></p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Device ID</th>
+                <th>Power Consumed (mWh)</th>
+                <th>Screen On Duration</th>
+                <th>Last Seen</th>
+            </tr>
+        </thead>
+        <tbody id="systems-table-body"></tbody>
+    </table>
+
+    <div id="chart-container">
+        <h2>Live Power Consumption</h2>
+        <canvas id="powerChart"></canvas>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('powerChart').getContext('2d');
+        let labels = [];
+        let powerData = [];
+
+        let powerChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Power (W)',
+                    data: powerData,
+                    borderColor: '#00ff00',
+                    backgroundColor: 'rgba(0, 255, 0, 0.2)',
+                    borderWidth: 2,
+                    pointRadius: 0,  
+                    tension: 0.4    
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { display: false },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0, 255, 0, 0.2)' },
+                        ticks: { color: '#00ff00' }
+                    }
+                },
+                animation: { duration: 500 }
+            }
+        });
+
+        function updateStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('connected-count').innerText = data.connected_systems;
+
+                    let tableBody = document.getElementById('systems-table-body');
+                    tableBody.innerHTML = "";
+
+                    let totalPower = 0;
+                    Object.keys(data.systems_data).forEach(device_id => {
+                        let device = data.systems_data[device_id];
+                        totalPower += device.total_power_consumed;
+
+                        let row = `<tr>
+                            <td>${device_id}</td>
+                            <td>${device.total_power_consumed}</td>
+                            <td>${device.total_screen_on_duration}</td>
+                            <td>${new Date(device.last_seen).toLocaleTimeString()}</td>
+                        </tr>`;
+
+                        tableBody.innerHTML += row;
+                    });
+
+                    let now = new Date().toLocaleTimeString();
+                    if (labels.length > 30) {
+                        labels.shift();
+                        powerData.shift();
+                    }
+                    labels.push(now);
+                    powerData.push(totalPower + (5 * Math.sin(labels.length)));  
+
+                    powerChart.update();
+                })
+                .catch(error => console.error('Error fetching status:', error));
+        }
+
+        setInterval(updateStatus, 2000);
+        window.onload = updateStatus;
+    </script>
+</body>
+</html>
